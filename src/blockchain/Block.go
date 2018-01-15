@@ -2,7 +2,6 @@ package blockchain
 
 import (
 	"bytes"
-	"crypto/sha256"
 	"encoding/gob"
 	"time"
 	"encoding/hex"
@@ -16,19 +15,6 @@ type Block struct {
 	Nonce        int
 }
 
-func (b *Block) InfoMap() map[string]interface{} {
-	info := make(map[string]interface{})
-	info["Hash"] = hex.EncodeToString(b.Hash)
-	info["PreBlockHash"] = hex.EncodeToString(b.PreBlockHash)
-
-	var Transactions []map[string]interface{}
-	for _, tx := range b.Transactions {
-		Transactions = append(Transactions, tx.InfoMap())
-	}
-	info["Transactions"] = Transactions
-	return info
-}
-
 func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
 	block := &Block{time.Now().Unix(), transactions, prevBlockHash, []byte{}, 0}
 	pow := NewProofOfWork(block)
@@ -39,14 +25,13 @@ func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
 }
 
 func (b *Block) HashTransactions() []byte {
-	var txHashes [][]byte
-	var txHash [32]byte
+	var transactions [][]byte
 
 	for _, tx := range b.Transactions {
-		txHashes = append(txHashes, tx.ID)
+		transactions = append(transactions, tx.Serialize())
 	}
-	txHash = sha256.Sum256(bytes.Join(txHashes, []byte{}))
-	return txHash[:]
+	mTree := NewMerkleTree(transactions)
+	return mTree.RootNode.Data
 }
 
 func (b *Block) Serialize() []byte {
@@ -67,4 +52,16 @@ func DeserializeBlock(d []byte) *Block {
 		panic(err)
 	}
 	return &block
+}
+func (b *Block) InfoMap() map[string]interface{} {
+	info := make(map[string]interface{})
+	info["Hash"] = hex.EncodeToString(b.Hash)
+	info["PreBlockHash"] = hex.EncodeToString(b.PreBlockHash)
+	info["Timestamp"] = time.Unix(b.Timestamp, 0)
+	var Transactions []map[string]interface{}
+	for _, tx := range b.Transactions {
+		Transactions = append(Transactions, tx.InfoMap())
+	}
+	info["Transactions"] = Transactions
+	return info
 }

@@ -1,7 +1,6 @@
 package blockchain
 
 import (
-	"log"
 	"encoding/json"
 )
 
@@ -10,7 +9,10 @@ type Client struct {
 
 func (cli *Client) CreateBlockChain(address string) {
 	bc := CreateBlockChain(address)
-	bc.Close()
+	defer bc.Close()
+
+	UTXOSet := UTXOSet{bc}
+	UTXOSet.ReIndex()
 }
 
 func (cli *Client) PrintChain() string {
@@ -22,13 +24,11 @@ func (cli *Client) PrintChain() string {
 }
 
 func (cli *Client) GetBalance(address string) int {
-	if !ValidateAddress(address) {
-		log.Panic("Address is not valid")
-	}
 	bc := GetBlockChain()
 	defer bc.Close()
+	UTXOSet := UTXOSet{bc}
 	balance := 0
-	UTXOs := bc.FindUTXO(GetPubKeyHash(address))
+	UTXOs := UTXOSet.FindUTXO(GetPubKeyHash(address))
 	for _, out := range UTXOs {
 		balance += out.Value
 	}
@@ -36,17 +36,12 @@ func (cli *Client) GetBalance(address string) int {
 }
 
 func (cli *Client) Send(from, to string, amount int) {
-	if !ValidateAddress(from) {
-		log.Panic("sender address is not valid")
-	}
-	if !ValidateAddress(to) {
-		log.Panic("receiver address is not valid")
-	}
-
 	bc := GetBlockChain()
 	defer bc.Close()
+	UTXOSet := UTXOSet{bc}
 	tx := NewUTXOTransaction(from, to, amount, bc)
-	bc.AddBlock([]*Transaction{tx})
+	newBlock := bc.AddBlock([]*Transaction{tx})
+	UTXOSet.Update(newBlock)
 }
 
 func (cli *Client) CreateWallet() string {

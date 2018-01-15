@@ -21,22 +21,10 @@ type Transaction struct {
 	Vout []TxOutput
 }
 
-func (tx Transaction) SetID() {
-	var encoded bytes.Buffer
+func (tx Transaction) Hash() []byte {
 	var hash [32]byte
-	enc := gob.NewEncoder(&encoded)
-	err := enc.Encode(tx)
-	PanicIfError(err)
-	hash = sha256.Sum256(encoded.Bytes())
-	tx.ID = hash[:]
-}
-
-func (tx *Transaction) Hash() []byte {
-	var hash [32]byte
-	txCopy := *tx
-	txCopy.ID = []byte{}
-
-	hash = sha256.Sum256(txCopy.Serialize())
+	tx.ID = []byte{}
+	hash = sha256.Sum256(tx.Serialize())
 	return hash[:]
 }
 
@@ -48,10 +36,8 @@ func (tx Transaction) Serialize() []byte {
 	return encoded.Bytes()
 }
 
-func NewCoinbaseTx(to, data string) *Transaction {
-	if data == "" {
-		data = fmt.Sprintf("Reward to %s", to)
-	}
+func NewCoinbaseTx(to string) *Transaction {
+	data := fmt.Sprintf("Reward to %s", to)
 	txin := TxInput{[]byte{}, -1, nil, []byte(data)}
 	txout := NewTxOutput(subsidy, to)
 	tx := Transaction{nil, []TxInput{txin}, []TxOutput{*txout}}
@@ -60,15 +46,21 @@ func NewCoinbaseTx(to, data string) *Transaction {
 }
 
 func NewUTXOTransaction(from, to string, amount int, bc *BlockChain) *Transaction {
+	if !ValidateAddress(from) {
+		log.Panic("sender address is not valid")
+	}
+	if !ValidateAddress(to) {
+		log.Panic("receiver address is not valid")
+	}
 	var inputs []TxInput
 	var outputs []TxOutput
-
+	// 钱包地址
 	wallets, err := GetWallets()
 	PanicIfError(err)
-
 	wallet := wallets.GetWallet(from)
 	pubKeyHash := HashPubKey(wallet.PublicKey)
-	acc, validOutputs := bc.FindSpendableOutputs(pubKeyHash, amount)
+	// 输入
+	acc, validOutputs := UTXOSet{bc}.FindSpendableOutputs(pubKeyHash, amount)
 	if acc < amount {
 		log.Panic("not enough funds")
 	}
@@ -80,16 +72,15 @@ func NewUTXOTransaction(from, to string, amount int, bc *BlockChain) *Transactio
 			inputs = append(inputs, input)
 		}
 	}
-
+	// 输出
 	outputs = append(outputs, *NewTxOutput(amount, to))
 	if acc > amount {
 		outputs = append(outputs, *NewTxOutput(acc-amount, from))
 	}
-
+	// 创建交易
 	tx := Transaction{nil, inputs, outputs}
 	tx.ID = tx.Hash()
 	bc.SignTransaction(&tx, wallet.PrivateKey)
-
 	return &tx
 }
 
@@ -99,6 +90,7 @@ func (tx Transaction) IsCoinbase() bool {
 
 func (tx Transaction) Sign(privKey ecdsa.PrivateKey, prevTXs map[string]Transaction) {
 	if tx.IsCoinbase() {
+		// coinBase不需要签名，而是检验工作量
 		return
 	}
 	txCopy := tx.TrimmedCopy()

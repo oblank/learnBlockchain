@@ -3,6 +3,7 @@ package blockchain
 import (
 	"bytes"
 	"encoding/hex"
+	"encoding/gob"
 )
 
 type TxOutput struct {
@@ -29,4 +30,28 @@ func (out *TxOutput) InfoMap() map[string]interface{} {
 	info["Value"] = out.Value
 	info["PubKeyHash"] = hex.EncodeToString(out.PubKeyHash)
 	return info
+}
+
+type TxOutputs struct {
+	Outputs map[int]TxOutput
+}
+
+func NewTxOutputs() TxOutputs {
+	return TxOutputs{Outputs: make(map[int]TxOutput)}
+}
+
+func (outs TxOutputs) Serialize() []byte {
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	err := enc.Encode(outs)
+	PanicIfError(err)
+	return buff.Bytes()
+}
+
+func DeserializeOutputs(data []byte) TxOutputs {
+	var outputs TxOutputs
+	dec := gob.NewDecoder(bytes.NewReader(data))
+	err := dec.Decode(&outputs)
+	PanicIfError(err)
+	return outputs
 }
