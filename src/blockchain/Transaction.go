@@ -1,15 +1,15 @@
 package blockchain
 
 import (
-	"fmt"
 	"bytes"
-	"encoding/gob"
-	"crypto/sha256"
 	"crypto/ecdsa"
-	"encoding/hex"
-	"crypto/rand"
-	"log"
 	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/gob"
+	"encoding/hex"
+	"fmt"
+	"log"
 	"math/big"
 )
 

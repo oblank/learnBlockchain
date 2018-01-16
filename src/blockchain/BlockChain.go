@@ -1,13 +1,13 @@
 package blockchain
 
 import (
-	"github.com/boltdb/bolt"
-	"encoding/hex"
-	"os"
-	"log"
 	"bytes"
-	"errors"
 	"crypto/ecdsa"
+	"encoding/hex"
+	"errors"
+	"github.com/boltdb/bolt"
+	"log"
+	"os"
 )
 
 const blockBucket = "blocks"

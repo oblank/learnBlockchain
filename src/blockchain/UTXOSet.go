@@ -1,8 +1,8 @@
 package blockchain
 
 import (
-	"github.com/boltdb/bolt"
 	"encoding/hex"
+	"github.com/boltdb/bolt"
 )
 
 const utxoBucket = "utxo"

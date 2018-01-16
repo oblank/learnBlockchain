@@ -3,8 +3,8 @@ package blockchain
 import (
 	"bytes"
 	"encoding/gob"
-	"time"
 	"encoding/hex"
+	"time"
 )
 
 type Block struct {

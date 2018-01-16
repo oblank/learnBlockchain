@@ -3,10 +3,10 @@ package blockchain
 import (
 	"bytes"
 	"crypto/sha256"
-	"math"
-	"math/big"
 	"encoding/binary"
 	"log"
+	"math"
+	"math/big"
 )
 
 const targetBits = 16

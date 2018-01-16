@@ -2,8 +2,8 @@ package blockchain
 
 import (
 	"bytes"
-	"encoding/hex"
 	"encoding/gob"
+	"encoding/hex"
 )
 
 type TxOutput struct {

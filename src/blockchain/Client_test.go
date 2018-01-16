@@ -13,7 +13,7 @@ func TestCreateWallet(t *testing.T) {
 	t.Log(address)
 }
 
-func TestListAddresses(t *testing.T)  {
+func TestListAddresses(t *testing.T) {
 	cli := Client{}
 	t.Log(cli.ListAddresses())
 }
@@ -31,7 +31,7 @@ func TestPrintChain(t *testing.T) {
 
 func TestSend(t *testing.T) {
 	cli := Client{}
-	cli.Send(foo, bar, 2)
+	cli.Send(bar, foo, 1)
 	t.Log("Success")
 }
 

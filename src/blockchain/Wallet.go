@@ -1,14 +1,14 @@
 package blockchain
 
 import (
+	"bytes"
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"log"
 	"crypto/sha256"
-	"crypto"
-	"bytes"
 	_ "golang.org/x/crypto/ripemd160"
+	"log"
 )
 
 const walletFile = "wallets.bin"
@@ -40,7 +40,7 @@ func ValidateAddress(address string) bool {
 	pubKeyHash := Base58Decode([]byte(address))
 	actualChecksum := pubKeyHash[len(pubKeyHash)-addressChecksumLen:]
 	version := pubKeyHash[0]
-	pubKeyHash = pubKeyHash[1: len(pubKeyHash)-addressChecksumLen]
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-addressChecksumLen]
 	targetChecksum := Checksum(append([]byte{version}, pubKeyHash...))
 
 	return bytes.Compare(actualChecksum, targetChecksum) == 0
@@ -51,7 +51,7 @@ func GetPubKeyHash(address string) []byte {
 		log.Panic("Address is not valid")
 	}
 	pubKeyHash := Base58Decode([]byte(address))
-	pubKeyHash = pubKeyHash[1: len(pubKeyHash)-addressChecksumLen]
+	pubKeyHash = pubKeyHash[1 : len(pubKeyHash)-addressChecksumLen]
 	return pubKeyHash
 }
 

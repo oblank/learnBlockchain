@@ -1,12 +1,12 @@
 package blockchain
 
 import (
-	"os"
+	"bytes"
+	"crypto/elliptic"
+	"encoding/gob"
 	"io/ioutil"
 	"log"
-	"encoding/gob"
-	"crypto/elliptic"
-	"bytes"
+	"os"
 )
 
 type Wallets struct {
@@ -30,7 +30,7 @@ func (ws Wallets) GetWallet(address string) Wallet {
 	return *ws.Wallets[address]
 }
 
-func (ws Wallets) GetAddresses() []string{
+func (ws Wallets) GetAddresses() []string {
 	var addresses []string
 	for k := range ws.Wallets {
 		addresses = append(addresses, k)
