@@ -11,7 +11,7 @@ import (
 )
 
 const blockBucket = "blocks"
-const dbFile = "/go/hello/bin/hello.db"
+const dbFile = "hello.db"
 
 type BlockChain struct {
 	tip []byte
