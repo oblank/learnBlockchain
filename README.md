@@ -4,7 +4,7 @@
 # 命令
 ## createblockchain -address ADDRESS
 创建区块链<br/>
-创建一个coibase交易，里面记录了奖励给ADDRESS账户的10个coin<br/>
+创建一个coinbase交易，里面记录了奖励给ADDRESS账户的10个coin<br/>
 把这个coinbase存储到创世块（genesis block）中<br/>
 把区块链信息（所有block的数据和最后一个Block的hash值）存储到hello.db中，并且创建UTXO集提高查询效率
 
@@ -21,7 +21,7 @@
 打印wallet.bin中所有钱包的地址
 
 ## getbalance -address ADDRESS
-查询地址是ADDRESS的余额
+查询ADDRESS账户的余额
 
 ## send -from FROM -to TO -amount AMOUNT
 从FROM账户转帐AMOUNT个coin到TO账户<br/>
