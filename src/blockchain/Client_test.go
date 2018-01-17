@@ -4,39 +4,24 @@ import (
 	"testing"
 )
 
-const foo = "1Bknnztugm7d8s813CFvUcJHhzezUUDPYM"
-const bar = "1JHukhuBKcaWFkX5Mm8JS4uK3paMP9P7Gu"
+const foo = "1Pg9f5myjVpxHFdg7R7egzyExNPzGEdscS"
+const bar = "14dVjU2fw8ZdZ3p2sszvZFW18PTH7Zw13p"
 
 func TestCreateWallet(t *testing.T) {
-	cli := Client{}
-	address := cli.CreateWallet()
+	address := CreateWallet()
 	t.Log(address)
 }
 
 func TestListAddresses(t *testing.T) {
-	cli := Client{}
-	t.Log(cli.ListAddresses())
-}
-
-func TestCreateBlockChain(t *testing.T) {
-	cli := Client{}
-	cli.CreateBlockChain(foo)
-	t.Log("Done")
-}
-
-func TestPrintChain(t *testing.T) {
-	cli := Client{}
-	t.Log(cli.PrintChain())
+	t.Log(ListAddresses())
 }
 
 func TestSend(t *testing.T) {
-	cli := Client{}
-	cli.Send(bar, foo, 1)
+	Send(bar, foo, 1)
 	t.Log("Success")
 }
 
 func TestGetBalance(t *testing.T) {
-	cli := Client{}
-	balance := cli.GetBalance(bar)
+	balance := GetBalance(foo)
 	t.Log(balance)
 }

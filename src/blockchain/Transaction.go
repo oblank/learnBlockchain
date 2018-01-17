@@ -90,7 +90,6 @@ func (tx Transaction) IsCoinbase() bool {
 
 func (tx Transaction) Sign(privKey ecdsa.PrivateKey, prevTXs map[string]Transaction) {
 	if tx.IsCoinbase() {
-		// coinBase不需要签名，而是检验工作量
 		return
 	}
 	txCopy := tx.TrimmedCopy()
@@ -109,9 +108,6 @@ func (tx Transaction) Sign(privKey ecdsa.PrivateKey, prevTXs map[string]Transact
 }
 
 func (tx *Transaction) Verify(prevTXs map[string]Transaction) bool {
-	if tx.IsCoinbase() {
-		return true
-	}
 	for _, vin := range tx.Vin {
 		if prevTXs[hex.EncodeToString(vin.Txid)].ID == nil {
 			log.Panic("previous transation is not correct")

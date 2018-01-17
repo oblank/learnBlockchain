@@ -11,7 +11,7 @@ import (
 	"log"
 )
 
-const walletFile = "wallets.bin"
+const walletFile = "/go/hello/bin/wallets.bin"
 const addressChecksumLen = 4
 const version = byte(0x00)
 

@@ -11,7 +11,7 @@ import (
 )
 
 const blockBucket = "blocks"
-const dbFile = "hello.db"
+const dbFile = "/go/hello/bin/hello.db"
 
 type BlockChain struct {
 	tip []byte
@@ -62,7 +62,7 @@ func GetBlockChain() *BlockChain {
 	return &BlockChain{tip, db}
 }
 
-func (bc *BlockChain) AddBlock(transactions []*Transaction) *Block {
+func (bc *BlockChain) MineBlock(transactions []*Transaction) *Block {
 	var lastHash []byte
 	for _, tx := range transactions {
 		if !bc.VerifyTransaction(tx) {
@@ -151,6 +151,9 @@ func (bc *BlockChain) SignTransaction(tx *Transaction, priKey ecdsa.PrivateKey) 
 }
 
 func (bc *BlockChain) VerifyTransaction(tx *Transaction) bool {
+	if tx.IsCoinbase() {
+		return true
+	}
 	preTXs := make(map[string]Transaction)
 	for _, vin := range tx.Vin {
 		preTX, err := bc.FindTransaction(vin.Txid)

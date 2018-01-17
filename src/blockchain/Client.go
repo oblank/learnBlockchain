@@ -1,29 +1,9 @@
 package blockchain
 
-import (
-	"encoding/json"
-)
-
 type Client struct {
 }
 
-func (cli *Client) CreateBlockChain(address string) {
-	bc := CreateBlockChain(address)
-	defer bc.Close()
-
-	UTXOSet := UTXOSet{bc}
-	UTXOSet.ReIndex()
-}
-
-func (cli *Client) PrintChain() string {
-	bc := GetBlockChain()
-	defer bc.Close()
-	info := bc.InfoMap()
-	b, _ := json.Marshal(info)
-	return string(b)
-}
-
-func (cli *Client) GetBalance(address string) int {
+func GetBalance(address string) int {
 	bc := GetBlockChain()
 	defer bc.Close()
 	UTXOSet := UTXOSet{bc}
@@ -35,23 +15,24 @@ func (cli *Client) GetBalance(address string) int {
 	return balance
 }
 
-func (cli *Client) Send(from, to string, amount int) {
+func Send(from, to string, amount int) {
 	bc := GetBlockChain()
 	defer bc.Close()
 	UTXOSet := UTXOSet{bc}
 	tx := NewUTXOTransaction(from, to, amount, bc)
-	newBlock := bc.AddBlock([]*Transaction{tx})
+	cbTx := NewCoinbaseTx(from)
+	newBlock := bc.MineBlock([]*Transaction{tx, cbTx})
 	UTXOSet.Update(newBlock)
 }
 
-func (cli *Client) CreateWallet() string {
+func CreateWallet() string {
 	wallets, _ := GetWallets()
 	address := wallets.CreateWallet()
 	wallets.SaveToFile()
 	return address
 }
 
-func (cli *Client) ListAddresses() []string {
+func ListAddresses() []string {
 	wallets, _ := GetWallets()
 	return wallets.GetAddresses()
 }
